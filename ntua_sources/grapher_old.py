@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Distributed Image Placer.  If not, see https://www.gnu.org/licenses/.
 
-import string, random, ilp
+import string, random
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,7 +25,6 @@ numpy.random.seed(10)
 imageSize = 3*1024*1024*1024
 bandwidthEthernet = 10*1024*1024*1024
 bandwidthWifi = 25*1024*1024
-bandwidthlocalfile = 100*1024*1024*1024
 
 def draw_continuum(filename: string, color_map, graph, mode=None):
     
@@ -46,62 +45,90 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
 
 def create_continuum(size=20, degree = 2):
     # Graph creation
-    # G = nx.star_graph(degree)
+    # G = nx.star_graph(NUM_EDGES)
     G2 = nx.barabasi_albert_graph(size, degree)
-    # G2 = nx.generators.classic.balanced_tree(size, degree)
+    # G2 = nx.generators.classic.balanced_tree(8, 2)
     # G2 = nx.generators.classic.binomial_tree(size)
 
     NODES = G2.number_of_nodes()
-    for n in G2:
-        G2.add_edge(n,n)
+    NUM_NODES_ACTIVATED = floor(NODES / 1)
+    NUM_NODES_WITH_IMAGE = floor(NODES / 3)
 
     # Attributes to the graph
     edgeCapacities = {}
-    for edge in G2.edges:
-        if edge[0] == edge[1]:
-            edgeCapacities[edge] = bandwidthlocalfile
-        elif random.random() < 0.7:
-            edgeCapacities[edge] = bandwidthWifi
+    for node in G2.edges:
+        if random.random() < 0.7:
+            edgeCapacities[node] = bandwidthWifi
         else:
-            edgeCapacities[edge] = bandwidthEthernet
+            edgeCapacities[node] = bandwidthEthernet
     nx.set_edge_attributes(G2, values=edgeCapacities, name='capacity')
     nx.set_edge_attributes(G2, values=0, name='usage')
     nx.set_edge_attributes(G2, values=0, name='percentage')
-    
-    ilpModel = ilp.ilp_model(G2,imageSize)
-    res = ilpModel.solve()
-    if res['statusCode'] == 1:
-        nodes_with_image = []
-        for var in res['variables']:
-            if 'activation' in var.name:
-                if var.value() == 1:
-                    nodes_with_image.append(int(var.name.split('_')[1]))
-            else:
-                print(var.name)
-                nodes = var.name.split('_')[1]+var.name.split('_')[2]
-                n = int(nodes.split(',')[0].replace('(',''))
-                d = int(nodes.split(',')[1].replace(')',''))
-                G2[n][d]['usage'] = var.value()
-                G2[n][d]['percentage'] = round(G2[n][d]['usage'] / G2[n][d]['capacity'],6) * 100
-                print(f"Usage of channel {n} to {d} is {G2[n][d]['percentage']*100}")
-    else:
-        print(res['status'])
-        return
 
     # Nodes to activate
-    nodes_activated = np.random.choice(NODES, NODES, replace=False)
+    nodes_activated = np.random.choice(NODES, NUM_NODES_ACTIVATED, replace=False)
     print(f"nodes activated {nodes_activated}")
 
     # Nodes with image
+    nodes_with_image = np.random.choice(NODES, NUM_NODES_WITH_IMAGE, replace=False)
     print(f"nodes nodes_with_image {nodes_with_image}")
+
+    betweenness_cent = nx.betweenness_centrality(G2)
+    print(betweenness_cent)
+
+    degree_cent = nx.degree_centrality(G2)
+    print(degree_cent)
+
+    # nx.set_node_attributes(G2, bc, "betweenness")
+    sorted_betweenness_cent = sorted(betweenness_cent, key=lambda x: betweenness_cent[x], reverse=True)
+    print(sorted_betweenness_cent)
+
+    sorted_degree_cent = sorted(degree_cent, key=lambda x: degree_cent[x], reverse=True)
+    print(sorted_degree_cent)
+
+    # Top k nodes
+    nodes_with_image = sorted_betweenness_cent[:NUM_NODES_WITH_IMAGE]
+
+    # Compute shortest paths
+    shortest_paths = nx.shortest_path(G2)
+
+    # find the image at a least amount of hops
+    nearest_image = []
+    for active_node in nodes_activated:
+        nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
+        
+    for i in range(len(nodes_activated)):
+        sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
+        print (f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
+        for j in range(len(sp) - 1):
+            G2[sp[j]][sp[j + 1]]['usage'] +=imageSize
+            G2[sp[j]][sp[j + 1]]['percentage'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
+            print(f"Usage of channel {sp[j]} to {sp[j+1]} is {G2[sp[j]][sp[j + 1]]['percentage']*100}")
+
+    sp_capacity = []
+    for i in range(len(nodes_activated)):
+        sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
+        if nodes_activated[i] == nearest_image[i]:
+            sp_capacity.append((nodes_activated[i], float('inf')))
+        else:
+            sp_capacity.append((nodes_activated[i], min([G2[sp[i]][sp[i+1]]['capacity']/G2[sp[i]][sp[i+1]]['usage'] for i in range(len(sp)-1) if not nodes_activated[i] == nearest_image[i]])))
+
+    print(f"Max Capacities {sp_capacity}")
 
     color_map = []
     for node in G2:
-        if node in nodes_with_image:
-            color_map.append('green')
+        if node in nodes_activated:
+            if node in nodes_with_image:
+                color_map.append('green')
+            else:
+                color_map.append('cyan')
+        elif node in nodes_with_image:
+            color_map.append('red')
         else:
             color_map.append('orange')
-            
+
+    # for mode in range(0,8):
+        # draw_continuum("mode_"+str(mode)+".png", color_map, G2, mode)
     draw_continuum("mode_"+str(2)+".png", color_map, G2, 2)
     
 create_continuum()
