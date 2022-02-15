@@ -39,34 +39,39 @@ class ilp_model:
             print(f"{name}: {constraint.value()}")
         print()
         
+        return {'statusCode':self.model.status,'status':LpStatus[self.model.status],'variables':self.model.variables()}
+        
     def solve(self):
         self.model = LpProblem(name="minVertexCover", sense=LpMinimize)
         
-        activation = LpVariable.dicts("activation",(nodeIndex for nodeIndex in range(self.graph.number_of_nodes())),cat='Binary')
-        transfered = LpVariable.dicts("transfered",((n,d) for n,d in self.graph.edges),cat='Integer',lowBound=0)
+        activation = LpVariable.dicts("activation",(n for n in self.graph.nodes),cat='Integer',lowBound=0)
+        transfered = LpVariable.dicts("transfered",(edge for edge in self.graph.edges),cat='Integer',lowBound=0)
+                
+        # for n in self.graph: 
+            # for tempn,d in self.graph.edges(n):
+                # self.model += transfered[(n,d)] <= self.graph.edges[n,d]['capacity']*activation[n]*5
         
-        total_caps = []
-        for n in range(self.graph.number_of_nodes()):
-            if n in self.graph:
-                total_cap = 0.0
-                for d in self.graph[n]:
-                    total_cap += self.graph[n][d]['capacity']
-                total_caps.append(total_cap)
-        #Δεν δουλεύει το self.graph[n], άλλαξτο σε graph.edges με κάποιο τρόπο.
-        for n in self.graph:
-            self.model += lpSum([transfered[(n,d)] for d in self.graph[n]]) <= total_caps[n]*activation[n]*3
+        for n in self.graph: 
+            self.model += lpSum([transfered[edge] for edge in self.graph.edges if edge[0] == n or edge[1] == n]) >= self.volume
         
-        for d in range(self.graph.number_of_nodes()):
-            self.model += lpSum([transfered[(n,d)] for n in self.graph if d in self.graph[n]]) == self.volume
-            
-        for n in self.graph:
-            for d in self.graph[n]:
-                self.model += transfered[(n,d)] <= self.volume*activation[n]
+        for edge in self.graph.edges:
+            self.model += transfered[edge] <= self.volume*(activation[edge[0]]+activation[edge[1]])*self.graph.number_of_nodes()
+            # self.model += transfered[edge] <= self.graph.edges[edge]['capacity']*(activation[edge[0]]+activation[edge[1]])*5
         
         self.model += lpSum(
-            [activation[n]*self.volume for n in range(self.graph.number_of_nodes())] + 
-            [transfered[(n,d)]*(1/self.graph[n][d]['capacity']) for n in self.graph for d in self.graph[n]]
+            [activation[n]*self.volume for n in self.graph] + 
+            [transfered[edge]*(1/self.graph.edges[edge[0],edge[1]]['capacity']) for edge in self.graph.edges]
         )
         
         status = self.model.solve()
+        
+        print(f"status: {self.model.status}, {LpStatus[self.model.status]}")
+        print(f"objective: {self.model.objective.value()}")
+        for var in self.model.variables():
+            print(f"{var.name}: {var.value()}")
+        print()
+        for name, constraint in self.model.constraints.items():
+            print(f"{name}: {constraint.value()}")
+        print()
+        
         return {'statusCode':self.model.status,'status':LpStatus[self.model.status],'variables':self.model.variables()}

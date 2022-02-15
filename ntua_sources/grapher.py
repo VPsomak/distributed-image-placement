@@ -25,11 +25,11 @@ numpy.random.seed(10)
 imageSize = 3*1024*1024*1024
 bandwidthEthernet = 10*1024*1024*1024
 bandwidthWifi = 25*1024*1024
-bandwidthlocalfile = 100*1024*1024*1024
+bandwidthlocalfile = 0.5*1024*1024
 
 def draw_continuum(filename: string, color_map, graph, mode=None):
     
-    edge_labels = nx.get_edge_attributes(graph, 'percentage')
+    edge_labels = nx.get_edge_attributes(graph, 'time')
     
     drawFuncs = [nx.draw,nx.draw_circular,nx.draw_kamada_kawai,nx.draw_planar,nx.draw_random,nx.draw_spectral,nx.draw_spring,nx.draw_shell]
     drawLayouts = [nx.drawing.layout.spiral_layout,nx.drawing.layout.circular_layout,nx.drawing.layout.kamada_kawai_layout,nx.drawing.layout.planar_layout,nx.drawing.layout.random_layout,nx.drawing.layout.spectral_layout,nx.drawing.layout.spring_layout,nx.drawing.layout.shell_layout]
@@ -44,7 +44,7 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
     plt.show()
     plt.clf()
 
-def create_continuum(size=20, degree = 2):
+def create_continuum(size=15, degree = 2):
     # Graph creation
     # G = nx.star_graph(degree)
     G2 = nx.barabasi_albert_graph(size, degree)
@@ -52,8 +52,8 @@ def create_continuum(size=20, degree = 2):
     # G2 = nx.generators.classic.binomial_tree(size)
 
     NODES = G2.number_of_nodes()
-    for n in G2:
-        G2.add_edge(n,n)
+    # for n in G2:
+        # G2.add_edge(n,n)
 
     # Attributes to the graph
     edgeCapacities = {}
@@ -66,7 +66,8 @@ def create_continuum(size=20, degree = 2):
             edgeCapacities[edge] = bandwidthEthernet
     nx.set_edge_attributes(G2, values=edgeCapacities, name='capacity')
     nx.set_edge_attributes(G2, values=0, name='usage')
-    nx.set_edge_attributes(G2, values=0, name='percentage')
+    nx.set_edge_attributes(G2, values=0, name='time')
+    nx.set_edge_attributes(G2, values=0, name='numImages')
     
     ilpModel = ilp.ilp_model(G2,imageSize)
     res = ilpModel.solve()
@@ -82,8 +83,9 @@ def create_continuum(size=20, degree = 2):
                 n = int(nodes.split(',')[0].replace('(',''))
                 d = int(nodes.split(',')[1].replace(')',''))
                 G2[n][d]['usage'] = var.value()
-                G2[n][d]['percentage'] = round(G2[n][d]['usage'] / G2[n][d]['capacity'],6) * 100
-                print(f"Usage of channel {n} to {d} is {G2[n][d]['percentage']*100}")
+                G2[n][d]['numImages'] = round(G2[n][d]['usage'] / imageSize,4)
+                G2[n][d]['time'] = round(G2[n][d]['usage'] / G2[n][d]['capacity'],6) * 100
+                print(f"Usage of channel {n} to {d} is {G2[n][d]['time']*100}")
     else:
         print(res['status'])
         return
