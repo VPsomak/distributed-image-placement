@@ -13,7 +13,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Distributed Image Placer.  If not, see https://www.gnu.org/licenses/.
 
-import string, random, ilp
+import string, random, sys
+from algorithms import ilp, approximation
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
@@ -26,6 +27,10 @@ imageSize = 3*1024*1024*1024
 bandwidthEthernet = 10*1024*1024*1024
 bandwidthWifi = 25*1024*1024
 bandwidthlocalfile = 0.5*1024*1024
+#Available models: [ilp, approximation]
+model = "ilp"
+if len(sys.argv) > 1:
+    model = sys.argv[1]
 
 def draw_continuum(filename: string, color_map, graph, mode=None):
     
@@ -52,8 +57,7 @@ def create_continuum(size=15, degree = 2):
     # G2 = nx.generators.classic.binomial_tree(size)
 
     NODES = G2.number_of_nodes()
-    # for n in G2:
-        # G2.add_edge(n,n)
+    nodes_activated = np.random.choice(NODES, NODES, replace=False)
 
     # Attributes to the graph
     edgeCapacities = {}
@@ -69,30 +73,45 @@ def create_continuum(size=15, degree = 2):
     nx.set_edge_attributes(G2, values=0, name='time')
     nx.set_edge_attributes(G2, values=0, name='numImages')
     
-    ilpModel = ilp.ilp_model(G2,imageSize)
-    res = ilpModel.solve()
-    if res['statusCode'] == 1:
-        nodes_with_image = []
-        for var in res['variables']:
-            if 'activation' in var.name:
-                if var.value() == 1:
-                    nodes_with_image.append(int(var.name.split('_')[1]))
-            else:
-                print(var.name)
-                nodes = var.name.split('_')[1]+var.name.split('_')[2]
-                n = int(nodes.split(',')[0].replace('(',''))
-                d = int(nodes.split(',')[1].replace(')',''))
-                G2[n][d]['usage'] = var.value()
-                G2[n][d]['numImages'] = round(G2[n][d]['usage'] / imageSize,4)
-                G2[n][d]['time'] = round(G2[n][d]['usage'] / G2[n][d]['capacity'],6) * 100
-                print(f"Usage of channel {n} to {d} is {G2[n][d]['time']*100}")
-    else:
-        print(res['status'])
-        return
-
-    # Nodes to activate
-    nodes_activated = np.random.choice(NODES, NODES, replace=False)
-    print(f"nodes activated {nodes_activated}")
+    if model == "ilp":
+        ilpModel = ilp.ilp_model(G2,imageSize)
+        res = ilpModel.solve()
+        if res['statusCode'] == 1:
+            nodes_with_image = []
+            for var in res['variables']:
+                if 'activation' in var.name:
+                    if var.value() == 1:
+                        nodes_with_image.append(int(var.name.split('_')[1]))
+                else:
+                    print(var.name)
+                    nodes = var.name.split('_')[1]+var.name.split('_')[2]
+                    n = int(nodes.split(',')[0].replace('(',''))
+                    d = int(nodes.split(',')[1].replace(')',''))
+                    G2[n][d]['usage'] = var.value()
+                    G2[n][d]['numImages'] = round(G2[n][d]['usage'] / imageSize,4)
+                    G2[n][d]['time'] = round(G2[n][d]['usage'] / G2[n][d]['capacity'],6) * 100
+                    print(f"Usage of channel {n} to {d} is {G2[n][d]['time']*100}")
+        else:
+            print(res['status'])
+            return
+    elif model == "approximation":
+        res = []
+        size_ = []
+        approximation.vertex_cover_approx(G2, size_, res)
+        nodes_with_image = res[0]
+        shortest_paths = nx.shortest_path(G2)
+        nearest_image = []
+        for active_node in nodes_activated:
+            nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
+        
+        for i in range(len(nodes_activated)):
+            sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
+            print (f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
+            for j in range(len(sp) - 1):
+                G2[sp[j]][sp[j + 1]]['usage'] +=imageSize
+                G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize,4)
+                G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
+                print(f"Usage of channel {sp[j]} to {sp[j+1]} is {G2[sp[j]][sp[j + 1]]['time']*100}")
 
     # Nodes with image
     print(f"nodes nodes_with_image {nodes_with_image}")
