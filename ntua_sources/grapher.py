@@ -14,7 +14,7 @@
 #    along with Distributed Image Placer.  If not, see https://www.gnu.org/licenses/.
 
 import string, random, sys
-from algorithms import ilp, approximation
+from algorithms import ilp, approximation, bruteForce
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,11 +28,11 @@ bandwidthEthernet = 10*1024*1024*1024
 bandwidthWifi = 25*1024*1024
 bandwidthlocalfile = 0.5*1024*1024
 #Available models: [ilp, approximation]
-model = "ilp"
+model = "bruteforce"
+
 if len(sys.argv) > 1:
     model = sys.argv[1]
 
-#test
 def draw_continuum(filename: string, color_map, graph, mode=None):
     
     edge_labels = nx.get_edge_attributes(graph, 'time')
@@ -114,9 +114,26 @@ def create_continuum(size=15, degree = 2):
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j+1]} is {G2[sp[j]][sp[j + 1]]['time']*100}")
 
+    elif model == "bruteforce":
+        res = []
+        bruteForce.vertex_cover_brute(G2, res)
+        nodes_with_image = res[0]
+        shortest_paths = nx.shortest_path(G2)
+        nearest_image = []
+        for active_node in nodes_activated:
+            nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
+
+        for i in range(len(nodes_activated)):
+            sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
+            print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
+            for j in range(len(sp) - 1):
+                G2[sp[j]][sp[j + 1]]['usage'] += imageSize
+                G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
+                G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
+                print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
+
     # Nodes with image
     print(f"nodes nodes_with_image {nodes_with_image}")
-
     color_map = []
     for node in G2:
         if node in nodes_with_image:
