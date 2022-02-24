@@ -1,1 +1,1 @@
-# distributed-image-placement
+# Distributed Image Placement using Minimum Vertex Cover

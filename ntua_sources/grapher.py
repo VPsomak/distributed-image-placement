@@ -14,12 +14,13 @@
 #    along with Distributed Image Placer.  If not, see https://www.gnu.org/licenses/.
 
 import string, random, sys
-from algorithms import ilp, approximation, bruteForce, greedy, branchandbound
+from algorithms import ilp, approx, bruteForce, greedy, branchandbound, genetic
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random
 import time
+from networkx.algorithms import approximation
 from math import floor
 
 random.seed(10)
@@ -30,7 +31,6 @@ bandwidthWifi = 25*1024*1024
 bandwidthlocalfile = 0.5*1024*1024
 #Available models: [ilp, approximation]
 model = "bruteforce"
-
 if len(sys.argv) > 1:
     model = sys.argv[1]
 
@@ -51,10 +51,11 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
     plt.show()
     plt.clf()
 
-def create_continuum(size=15, degree = 2):
+def create_continuum(size=20, degree=10):
     # Graph creation
     # G = nx.star_graph(degree)
     G2 = nx.barabasi_albert_graph(size, degree)
+    print("Vertices:", len(G2.nodes), "Edges:", len(G2.edges), "\n")
     # G2 = nx.generators.classic.balanced_tree(size, degree)
     # G2 = nx.generators.classic.binomial_tree(size)
 
@@ -101,8 +102,9 @@ def create_continuum(size=15, degree = 2):
     elif model == "approximation":
         res = []
         size_ = []
-        approximation.vertex_cover_approx(G2, size_, res)
+        approx.vertex_cover_approx(G2, size_, res)
         nodes_with_image = res[0]
+        # print(nodes_with_image)
         shortest_paths = nx.shortest_path(G2)
         nearest_image = []
         for active_node in nodes_activated:
@@ -139,6 +141,7 @@ def create_continuum(size=15, degree = 2):
         res = []
         greedy.minimum_vertex_cover_greedy(G2, res)
         nodes_with_image = res[0]
+        # print(nodes_with_image)
         shortest_paths = nx.shortest_path(G2)
         nearest_image = []
         for active_node in nodes_activated:
@@ -155,8 +158,9 @@ def create_continuum(size=15, degree = 2):
 
     elif model == "branchandbound":
         res = []
-        branchandbound.Branch_and_Bound(G2, 600)
-        nodes_with_image = res[0]
+        branchandbound.Branch_and_Bound(G2, res)
+        nodes_with_image = res[0][0]
+        # print (nodes_with_image)
         shortest_paths = nx.shortest_path(G2)
         nearest_image = []
         for active_node in nodes_activated:
@@ -171,17 +175,43 @@ def create_continuum(size=15, degree = 2):
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
 
-    print("--- %s seconds ---" % (time.time() - start_time))
+    # elif model == "genetic":
+    #     res = []
+    #     genetic.vertex_cover_genetic(G2, 30)
+    #     nodes_with_image = res[0]
+    #     shortest_paths = nx.shortest_path(G2)
+    #     nearest_image = []
+    #     for active_node in nodes_activated:
+    #         nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
+    #
+    #     for i in range(len(nodes_activated)):
+    #         sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
+    #         print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
+    #         for j in range(len(sp) - 1):
+    #             G2[sp[j]][sp[j + 1]]['usage'] += imageSize
+    #             G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
+    #             G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
+    #             print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
 
+
+    # Execution Time
+    print("\n","Execution Time: %s seconds" % (time.time() - start_time))
     # Nodes with image
     print(f"nodes nodes_with_image {nodes_with_image}")
+
+    print ("Length of nodes with images", len(nodes_with_image))
+    print ("Length of min_weighted_vertex_cover", len(approximation.min_weighted_vertex_cover(G2)))
+    approximation_ratio = "{:.2f}".format(len(nodes_with_image) / len(approximation.min_weighted_vertex_cover(G2)))
+    print ("Approximation Ratio: ",approximation_ratio)
+
+
     color_map = []
     for node in G2:
         if node in nodes_with_image:
             color_map.append('green')
         else:
             color_map.append('orange')
-            
+
     draw_continuum(model+"mode_"+str(2)+".png", color_map, G2, 2)
     
 create_continuum()
