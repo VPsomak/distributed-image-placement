@@ -32,6 +32,7 @@ model = "ilp"
 if len(sys.argv) > 1:
     model = sys.argv[1]
 
+#test
 def draw_continuum(filename: string, color_map, graph, mode=None):
     
     edge_labels = nx.get_edge_attributes(graph, 'time')
