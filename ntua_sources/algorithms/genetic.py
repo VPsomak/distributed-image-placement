@@ -6,8 +6,8 @@ from networkx.algorithms import approximation
 
 # global configuration settings
 # note: keep population_size and elite_population_size of same parity
-population_size = 30
-elite_population_size = 8
+population_size = 20
+elite_population_size = 4
 mutation_probability = 0.04
 num_iterations = 5
 
@@ -253,7 +253,7 @@ def crossover(parent1, parent2):
     child2.evaluate_fitness()
     return child1, child2
 
-def vertex_cover_genetic(G, population_size):
+def vertex_cover_genetic(G, res):
     # initialise vertex cover population
     population = Population(G, population_size)
     population.evaluate_fitness_ranks()
@@ -280,8 +280,6 @@ def vertex_cover_genetic(G, population_size):
     for vertex_cover in population.vertexcovers:
         if vertex_cover.fitness > best_fitness:
             best_vertex_cover = vertex_cover
-
-    # print("Best Vertex Cover Size =", len(best_vertex_cover))
-    # print("Best Vertex Cover = ", best_vertex_cover.vertexlist)
-    # # print("approximation=", len(approximation.min_weighted_vertex_cover(G)))
-    # print ("approximation ratio", len(best_vertex_cover)/len(approximation.min_weighted_vertex_cover(G)))
+    list_mvc = best_vertex_cover.vertexlist.tolist()
+    res.append(list_mvc)
+    return (list_mvc,res)

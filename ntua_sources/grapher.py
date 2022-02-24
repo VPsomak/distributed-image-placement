@@ -51,7 +51,7 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
     plt.show()
     plt.clf()
 
-def create_continuum(size=20, degree=10):
+def create_continuum(size=20, degree=2):
     # Graph creation
     # G = nx.star_graph(degree)
     G2 = nx.barabasi_albert_graph(size, degree)
@@ -175,23 +175,23 @@ def create_continuum(size=20, degree=10):
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
 
-    # elif model == "genetic":
-    #     res = []
-    #     genetic.vertex_cover_genetic(G2, 30)
-    #     nodes_with_image = res[0]
-    #     shortest_paths = nx.shortest_path(G2)
-    #     nearest_image = []
-    #     for active_node in nodes_activated:
-    #         nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
-    #
-    #     for i in range(len(nodes_activated)):
-    #         sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
-    #         print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
-    #         for j in range(len(sp) - 1):
-    #             G2[sp[j]][sp[j + 1]]['usage'] += imageSize
-    #             G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
-    #             G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
-    #             print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
+    elif model == "genetic":
+        res = []
+        genetic.vertex_cover_genetic(G2, res)
+        nodes_with_image = res[0]
+        shortest_paths = nx.shortest_path(G2)
+        nearest_image = []
+        for active_node in nodes_activated:
+            nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
+
+        for i in range(len(nodes_activated)):
+            sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
+            print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
+            for j in range(len(sp) - 1):
+                G2[sp[j]][sp[j + 1]]['usage'] += imageSize
+                G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
+                G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
+                print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
 
 
     # Execution Time
