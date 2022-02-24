@@ -14,11 +14,12 @@
 #    along with Distributed Image Placer.  If not, see https://www.gnu.org/licenses/.
 
 import string, random, sys
-from algorithms import ilp, approximation, bruteForce
+from algorithms import ilp, approximation, bruteForce, greedy, branchandbound
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random
+import time
 from math import floor
 
 random.seed(10)
@@ -73,7 +74,9 @@ def create_continuum(size=15, degree = 2):
     nx.set_edge_attributes(G2, values=0, name='usage')
     nx.set_edge_attributes(G2, values=0, name='time')
     nx.set_edge_attributes(G2, values=0, name='numImages')
-    
+
+    start_time = time.time()
+
     if model == "ilp":
         ilpModel = ilp.ilp_model(G2,imageSize)
         res = ilpModel.solve()
@@ -132,6 +135,44 @@ def create_continuum(size=15, degree = 2):
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
 
+    elif model == "greedy":
+        res = []
+        greedy.minimum_vertex_cover_greedy(G2, res)
+        nodes_with_image = res[0]
+        shortest_paths = nx.shortest_path(G2)
+        nearest_image = []
+        for active_node in nodes_activated:
+            nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
+
+        for i in range(len(nodes_activated)):
+            sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
+            print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
+            for j in range(len(sp) - 1):
+                G2[sp[j]][sp[j + 1]]['usage'] += imageSize
+                G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
+                G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
+                print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
+
+    elif model == "branchandbound":
+        res = []
+        branchandbound.Branch_and_Bound(G2, 600)
+        nodes_with_image = res[0]
+        shortest_paths = nx.shortest_path(G2)
+        nearest_image = []
+        for active_node in nodes_activated:
+            nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
+
+        for i in range(len(nodes_activated)):
+            sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
+            print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
+            for j in range(len(sp) - 1):
+                G2[sp[j]][sp[j + 1]]['usage'] += imageSize
+                G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
+                G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
+                print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+
     # Nodes with image
     print(f"nodes nodes_with_image {nodes_with_image}")
     color_map = []
@@ -141,6 +182,6 @@ def create_continuum(size=15, degree = 2):
         else:
             color_map.append('orange')
             
-    draw_continuum("mode_"+str(2)+".png", color_map, G2, 2)
+    draw_continuum(model+"mode_"+str(2)+".png", color_map, G2, 2)
     
 create_continuum()
