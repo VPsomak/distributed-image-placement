@@ -3,9 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from operator import itemgetter
 
-# vertex_cover_approx
-# Generates an approximately optimal vertex cover for a given graph using the APPROX-VERTEX-COVER algorithm
-# found in (Cormen)
+
 def vertex_cover_approx(graph, size_, res):
     # generate all edges present in graph
     edges = graph.edges
