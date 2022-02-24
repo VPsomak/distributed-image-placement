@@ -30,6 +30,7 @@ bandwidthEthernet = 10*1024*1024*1024
 bandwidthWifi = 25*1024*1024
 bandwidthlocalfile = 0.5*1024*1024
 #Available models: [ilp, approximation]
+
 model = "bruteforce"
 if len(sys.argv) > 1:
     model = sys.argv[1]
@@ -51,13 +52,17 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
     plt.show()
     plt.clf()
 
-def create_continuum(size=20, degree=2):
+def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
     # Graph creation
-    # G = nx.star_graph(degree)
-    G2 = nx.barabasi_albert_graph(size, degree)
-    print("Vertices:", len(G2.nodes), "Edges:", len(G2.edges), "\n")
-    # G2 = nx.generators.classic.balanced_tree(size, degree)
+
     # G2 = nx.generators.classic.binomial_tree(size)
+    # G2 = nx.generators.classic.balanced_tree(branching_factor_of_tree, height_of_tree)
+    # G2 = nx.star_graph(size)
+    # G2 = nx.barabasi_albert_graph(size, degree)
+    # G2 = nx.erdos_renyi_graph(size, probability, seed=None, directed=False)
+    G2 = nx.newman_watts_strogatz_graph(size, knearest, probability, seed=None)
+
+    print("Vertices:", len(G2.nodes), "Edges:", len(G2.edges), "\n")
 
     NODES = G2.number_of_nodes()
     nodes_activated = np.random.choice(NODES, NODES, replace=False)
