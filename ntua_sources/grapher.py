@@ -29,11 +29,18 @@ imageSize = 3*1024*1024*1024
 bandwidthEthernet = 10*1024*1024*1024
 bandwidthWifi = 25*1024*1024
 bandwidthlocalfile = 0.5*1024*1024
-#Available models: [ilp, approximation]
 
-model = "bruteforce"
-if len(sys.argv) > 1:
+
+if len(sys.argv) == 3:
     model = sys.argv[1]
+    graph = sys.argv[2]
+else:
+    print ("Wrong number of arguments!\n")
+    print ("Example: python3 grapher.py [model] [algorithm] \n")
+    print ("Available models [ilp, approximation, bruteforce, branchandbound, genetic] \n")
+    print ("Available graphs [binomial_tree, balanced_tree, star, barabasi_albert, erdos_renyi, newman_watts_strogatz]")
+    sys.exit()
+
 
 def draw_continuum(filename: string, color_map, graph, mode=None):
     
@@ -52,15 +59,25 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
     plt.show()
     plt.clf()
 
-def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
+def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
     # Graph creation
 
-    # G2 = nx.generators.classic.binomial_tree(size)
-    # G2 = nx.generators.classic.balanced_tree(branching_factor_of_tree, height_of_tree)
-    # G2 = nx.star_graph(size)
-    # G2 = nx.barabasi_albert_graph(size, degree)
-    # G2 = nx.erdos_renyi_graph(size, probability, seed=None, directed=False)
-    G2 = nx.newman_watts_strogatz_graph(size, knearest, probability, seed=None)
+    if graph =="binomial_tree":
+        G2 = nx.generators.classic.binomial_tree(size)
+    elif graph =="balanced_tree":
+        G2 = nx.generators.classic.balanced_tree(branching_factor_of_tree, height_of_tree)
+    elif graph =="star":
+        G2 = nx.star_graph(size)
+    elif graph =="barabasi_albert":
+        G2 = nx.barabasi_albert_graph(size, degree)
+    elif graph =="erdos_renyi":
+        G2 = nx.erdos_renyi_graph(size, probability, seed=None, directed=False)
+    elif graph =="newman_watts_strogatz":
+        G2 = nx.newman_watts_strogatz_graph(size, knearest, probability, seed=None)
+    else:
+        print ("Give a correct graph as indicated from the list\n")
+        print("Available graphs [binomial_tree, balanced_tree, star, barabasi_albert, erdos_renyi, newman_watts_strogatz]")
+        sys.exit()
 
     print("Vertices:", len(G2.nodes), "Edges:", len(G2.edges), "\n")
 
@@ -114,7 +131,6 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
         nearest_image = []
         for active_node in nodes_activated:
             nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
-        
         for i in range(len(nodes_activated)):
             sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
             print (f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
@@ -123,7 +139,6 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
                 G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize,4)
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j+1]} is {G2[sp[j]][sp[j + 1]]['time']*100}")
-
     elif model == "bruteforce":
         res = []
         bruteForce.vertex_cover_brute(G2, res)
@@ -132,7 +147,6 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
         nearest_image = []
         for active_node in nodes_activated:
             nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
-
         for i in range(len(nodes_activated)):
             sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
             print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
@@ -141,7 +155,6 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
                 G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
-
     elif model == "greedy":
         res = []
         greedy.minimum_vertex_cover_greedy(G2, res)
@@ -151,7 +164,6 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
         nearest_image = []
         for active_node in nodes_activated:
             nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
-
         for i in range(len(nodes_activated)):
             sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
             print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
@@ -160,17 +172,16 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
                 G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
-
     elif model == "branchandbound":
         res = []
         branchandbound.Branch_and_Bound(G2, res)
         nodes_with_image = res[0][0]
-        # print (nodes_with_image)
+
+        print (nodes_with_image)
         shortest_paths = nx.shortest_path(G2)
         nearest_image = []
         for active_node in nodes_activated:
             nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
-
         for i in range(len(nodes_activated)):
             sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
             print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
@@ -179,7 +190,6 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
                 G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
-
     elif model == "genetic":
         res = []
         genetic.vertex_cover_genetic(G2, res)
@@ -188,7 +198,6 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
         nearest_image = []
         for active_node in nodes_activated:
             nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
-
         for i in range(len(nodes_activated)):
             sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
             print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
@@ -197,6 +206,10 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
                 G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
+    else:
+        print("Give a correct model as indicated from the list\n")
+        print("Available models [ilp, approximation, bruteforce, branchandbound, genetic] \n")
+        sys.exit()
 
 
     # Execution Time
@@ -217,6 +230,6 @@ def create_continuum(size=30, degree=2, branching_factor_of_tree=4, height_of_tr
         else:
             color_map.append('orange')
 
-    draw_continuum(model+"mode_"+str(2)+".png", color_map, G2, 2)
+    draw_continuum(model+"_"+model+"mode_"+str(2)+".png", color_map, G2, 2)
     
 create_continuum()
