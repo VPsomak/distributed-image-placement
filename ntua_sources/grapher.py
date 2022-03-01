@@ -15,6 +15,7 @@
 
 import string, random, sys
 from algorithms import ilp, approx, bruteForce, greedy, branchandbound, genetic
+import maxmin
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,12 +23,17 @@ import numpy.random
 import time
 from networkx.algorithms import approximation
 from math import floor
+# import satispy
 
 random.seed(10)
 numpy.random.seed(10)
 imageSize = 3*1024*1024*1024
+
+# 10737418240
 bandwidthEthernet = 10*1024*1024*1024
+# 26214400
 bandwidthWifi = 25*1024*1024
+# 524288
 bandwidthlocalfile = 0.5*1024*1024
 
 
@@ -55,11 +61,11 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
         drawFuncs[mode](graph, node_size=120, node_color=color_map, linewidths=0.1, font_size=6, font_weight='bold', with_labels=True)
         nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=6)
         
-    plt.savefig(filename, dpi=400)
+    #plt.savefig(filename, dpi=400)
     plt.show()
     plt.clf()
 
-def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
+def create_continuum(size=20, degree=2, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
     # Graph creation
 
     if graph =="binomial_tree":
@@ -79,7 +85,7 @@ def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tr
         print("Available graphs [binomial_tree, balanced_tree, star, barabasi_albert, erdos_renyi, newman_watts_strogatz]")
         sys.exit()
 
-    print("Vertices:", len(G2.nodes), "Edges:", len(G2.edges), "\n")
+    print("--Vertices:", len(G2.nodes), "--Edges:", len(G2.edges), "\n")
 
     NODES = G2.number_of_nodes()
     nodes_activated = np.random.choice(NODES, NODES, replace=False)
@@ -93,10 +99,49 @@ def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tr
             edgeCapacities[edge] = bandwidthWifi
         else:
             edgeCapacities[edge] = bandwidthEthernet
+
+    # max-min fairness
+    output = maxmin.max_min_fairness(demands=list(edgeCapacities.values()), capacity=20000000000)
+    #print("OUTPUT -- max-min fairness", output)
+    counter = 0
+    for key, value in edgeCapacities.items():
+        edgeCapacities[key] = output[counter]
+        counter = counter + 1
+    # print("Update", edgeCapacities)
+    # End of max-min fairness
+
     nx.set_edge_attributes(G2, values=edgeCapacities, name='capacity')
     nx.set_edge_attributes(G2, values=0, name='usage')
     nx.set_edge_attributes(G2, values=0, name='time')
     nx.set_edge_attributes(G2, values=0, name='numImages')
+
+    # for edge in G2.edges:
+    #     print (edge)
+    # print (edgeCapacities)
+
+
+
+
+    # Find the OPT solution first --------------------------------------
+    # start_time_OPT = time.time()
+    # res_OPT = []
+    # bruteForce.vertex_cover_brute(G2, res_OPT)
+    # nodes_with_image_OPT = res_OPT[0]
+    # shortest_paths_OPT = nx.shortest_path(G2)
+    # nearest_image_OPT = []
+    # for active_node in nodes_activated:
+    #     nearest_image_OPT.append(min(nodes_with_image_OPT, key=lambda x: len(shortest_paths_OPT[active_node][x])))
+    # for i in range(len(nodes_activated)):
+    #     sp = (shortest_paths_OPT[nodes_activated[i]][nearest_image_OPT[i]])
+    #     for j in range(len(sp) - 1):
+    #         G2[sp[j]][sp[j + 1]]['usage'] += imageSize
+    #         G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
+    #         G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
+    # print("\n", "Execution Time (OPT): %s seconds" % (time.time() - start_time_OPT))
+    # print(f"nodes nodes_with_image (OPT) {nodes_with_image_OPT}")
+    # print("Length of nodes with images (OPT)", len(nodes_with_image_OPT))
+    # #-------------------------------------------------------------------
+
 
     start_time = time.time()
 
@@ -139,6 +184,7 @@ def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tr
                 G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize,4)
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j+1]} is {G2[sp[j]][sp[j + 1]]['time']*100}")
+
     elif model == "bruteforce":
         res = []
         bruteForce.vertex_cover_brute(G2, res)
@@ -155,6 +201,7 @@ def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tr
                 G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
+
     elif model == "greedy":
         res = []
         greedy.minimum_vertex_cover_greedy(G2, res)
@@ -172,6 +219,7 @@ def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tr
                 G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
+
     elif model == "branchandbound":
         res = []
         branchandbound.Branch_and_Bound(G2, res)
@@ -190,6 +238,7 @@ def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tr
                 G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
                 G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
                 print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
+
     elif model == "genetic":
         res = []
         genetic.vertex_cover_genetic(G2, res)
@@ -216,12 +265,13 @@ def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tr
     print("\n","Execution Time: %s seconds" % (time.time() - start_time))
     # Nodes with image
     print(f"nodes nodes_with_image {nodes_with_image}")
-
     print ("Length of nodes with images", len(nodes_with_image))
-    print ("Length of min_weighted_vertex_cover", len(approximation.min_weighted_vertex_cover(G2)))
-    approximation_ratio = "{:.2f}".format(len(nodes_with_image) / len(approximation.min_weighted_vertex_cover(G2)))
-    print ("Approximation Ratio: ",approximation_ratio)
 
+    #print("Approximation Ratio: ", "{:.2f}".format(len(nodes_with_image) / len(nodes_with_image_OPT)))
+
+    # print ("Length of min_weighted_vertex_cover", len(approximation.vertex_cover.min_weighted_vertex_cover(G2)))
+    # approximation_ratio = "{:.2f}".format(len(nodes_with_image) / len(approximation.vertex_cover.min_weighted_vertex_cover(G2)))
+    # print ("Approximation Ratio: ",approximation_ratio)
 
     color_map = []
     for node in G2:
@@ -229,7 +279,6 @@ def create_continuum(size=20, degree=4, branching_factor_of_tree=4, height_of_tr
             color_map.append('green')
         else:
             color_map.append('orange')
-
-    draw_continuum(model+"_"+model+"mode_"+str(2)+".png", color_map, G2, 2)
+    draw_continuum(model+"_"+graph+"_mode_"+str(2)+".png", color_map, G2, 2)
     
 create_continuum()
