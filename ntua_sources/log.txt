@@ -1,0 +1,43 @@
+--Vertices: 20 --Edges: 36 
+
+Best Fitness 2.8221895505522487e-08
+Usage of channel 0 to 1 is 57982.06
+Usage of channel 0 to 2 is 0.0
+Usage of channel 0 to 3 is 0.0
+Usage of channel 0 to 4 is 1228800.0
+Usage of channel 0 to 6 is 0.0
+Usage of channel 0 to 7 is 0.0
+Usage of channel 0 to 8 is 0.0
+Usage of channel 0 to 12 is 0.0
+Usage of channel 0 to 13 is 0.0
+Usage of channel 0 to 15 is 1228800.0
+Usage of channel 1 to 9 is 0.0
+Usage of channel 1 to 11 is 0.0
+Usage of channel 2 to 3 is 1228800.0
+Usage of channel 2 to 5 is 0.0
+Usage of channel 2 to 7 is 39666.53
+Usage of channel 3 to 4 is 0.0
+Usage of channel 3 to 5 is 0.0
+Usage of channel 4 to 9 is 0.0
+Usage of channel 4 to 16 is 0.0
+Usage of channel 5 to 6 is 0.0
+Usage of channel 5 to 8 is 0.0
+Usage of channel 5 to 10 is 1228800.0
+Usage of channel 5 to 18 is 0.0
+Usage of channel 6 to 14 is 0.0
+Usage of channel 6 to 17 is 1228800.0
+Usage of channel 7 to 10 is 0.0
+Usage of channel 7 to 13 is 0.0
+Usage of channel 8 to 11 is 0.0
+Usage of channel 8 to 14 is 1228800.0
+Usage of channel 9 to 19 is 15588.34
+Usage of channel 11 to 12 is 0.0
+Usage of channel 12 to 15 is 0.0
+Usage of channel 12 to 16 is 0.0
+Usage of channel 12 to 17 is 10436.36
+Usage of channel 13 to 18 is 1228800.0
+Usage of channel 16 to 19 is 0.0
+
+ Execution Time: 0.08732318878173828 seconds
+nodes nodes_with_image [0, 3, 5, 6, 7, 9, 11, 12, 13, 14, 16]
+Length of nodes with images 11

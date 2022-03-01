@@ -155,7 +155,6 @@ def create_continuum(size=20, degree=2, branching_factor_of_tree=4, height_of_tr
                     if var.value() == 1:
                         nodes_with_image.append(int(var.name.split('_')[1]))
                 else:
-                    print(var.name)
                     nodes = var.name.split('_')[1]+var.name.split('_')[2]
                     n = int(nodes.split(',')[0].replace('(',''))
                     d = int(nodes.split(',')[1].replace(')',''))
@@ -241,20 +240,14 @@ def create_continuum(size=20, degree=2, branching_factor_of_tree=4, height_of_tr
 
     elif model == "genetic":
         res = []
-        genetic.vertex_cover_genetic(G2, res)
+        genetic.vertex_cover_genetic(G2, res, imageSize)
         nodes_with_image = res[0]
-        shortest_paths = nx.shortest_path(G2)
-        nearest_image = []
-        for active_node in nodes_activated:
-            nearest_image.append(min(nodes_with_image, key=lambda x: len(shortest_paths[active_node][x])))
-        for i in range(len(nodes_activated)):
-            sp = (shortest_paths[nodes_activated[i]][nearest_image[i]])
-            print(f"Shortest Path from {nodes_activated[i]} to {nearest_image[i]} is {sp}")
-            for j in range(len(sp) - 1):
-                G2[sp[j]][sp[j + 1]]['usage'] += imageSize
-                G2[sp[j]][sp[j + 1]]['numImages'] = round(G2[sp[j]][sp[j + 1]]['usage'] / imageSize, 4)
-                G2[sp[j]][sp[j + 1]]['time'] = G2[sp[j]][sp[j + 1]]['usage'] / G2[sp[j]][sp[j + 1]]['capacity']
-                print(f"Usage of channel {sp[j]} to {sp[j + 1]} is {G2[sp[j]][sp[j + 1]]['time'] * 100}")
+        transfered = res[2]
+        for edge in transfered:
+            G2[edge[0]][edge[1]]['usage'] = transfered[edge]
+            G2[edge[0]][edge[1]]['numImages'] = round(G2[edge[0]][edge[1]]['usage'] / imageSize,4)
+            G2[edge[0]][edge[1]]['time'] = round(G2[edge[0]][edge[1]]['usage'] / G2[edge[0]][edge[1]]['capacity'],6) * 100
+            print(f"Usage of channel {edge[0]} to {edge[1]} is {G2[edge[0]][edge[1]]['time']*100}")
     else:
         print("Give a correct model as indicated from the list\n")
         print("Available models [ilp, approximation, bruteforce, branchandbound, genetic] \n")

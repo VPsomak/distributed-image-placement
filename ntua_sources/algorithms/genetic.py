@@ -34,6 +34,7 @@ class VertexCover:
         self.vertexarray = np.array([False for _ in range(len(self.associated_population.graph.nodes()))])
         self.chromosomenumber = 0
         self.vertexlist = np.array([])
+        self.transfered = {edge:0 for edge in self.associated_population.graph.edges}
 
         # required when considering the entire population
         self.index = -1
@@ -46,8 +47,10 @@ class VertexCover:
     def evaluate_fitness(self):
         if not self.evaluated_fitness:
             original_graph = self.associated_population.graph.copy()
+            imageSize = self.associated_population.imageSize
 
             self.vertexarray = np.array([False for _ in range(len(original_graph.nodes()))])
+            self.transfered = {edge:0 for edge in self.associated_population.graph.edges}
             self.chromosomenumber = 0
 
             while len(original_graph.edges) > 0:
@@ -58,7 +61,7 @@ class VertexCover:
                 # remove all degree-1 vertices one-by-one
                 degree_one_vertex_found = False
                 for vertex in node_list:
-                    if original_graph.degree[vertex] == 1:
+                    if original_graph.degree[vertex] == 1 and original_graph.degree[list(original_graph.neighbors(vertex))[0]] == 1:
                         degree_one_vertex_found = True
 
                         neighbors = list(original_graph.neighbors(vertex))
@@ -71,6 +74,12 @@ class VertexCover:
                         removed_subgraph = neighbors
                         removed_subgraph.append(vertex)
                         original_graph.remove_nodes_from(removed_subgraph)
+                        
+                        # add a transfer on the edge just used
+                        if (vertex,adjvertex) in self.transfered:
+                            self.transfered[(vertex,adjvertex)] += imageSize
+                        else:
+                            self.transfered[(adjvertex,vertex)] += imageSize
 
                         break
 
@@ -84,6 +93,10 @@ class VertexCover:
                             # add all neighbours to vertex cover
                             for othervertex in original_graph.neighbors(vertex):
                                 self.vertexarray[othervertex] = True
+                                if (vertex,othervertex) in self.transfered:
+                                    self.transfered[(vertex,othervertex)] += imageSize
+                                else:
+                                    self.transfered[(othervertex,vertex)] += imageSize
 
                             # remove vertex along with neighbours from graph
                             removed_subgraph = list(original_graph.neighbors(vertex))
@@ -100,12 +113,30 @@ class VertexCover:
                         # go to the next chromosome to be checked
                         self.chromosomenumber = self.chromosomenumber + 1
                         continue
+                    
 
             # put all true elements in a numpy array - representing the actual vertex cover
             self.vertexlist = np.where(self.vertexarray == True)[0]
-            self.fitness = len(self.associated_population.graph.nodes()) / (1 + len(self.vertexlist))
+            
+            node_list = list(original_graph.nodes)
+            for vertex in node_list:
+                if not vertex in self.vertexlist:
+                    gotImage = False
+                    for edge in self.transfered:
+                        if (edge[0] == vertex or edge[1] == vertex) and self.transfered[edge] > 0:
+                            gotImage = True
+                    for other_vertex in self.vertexlist:
+                        if not gotImage:
+                            if (vertex,other_vertex) in self.transfered:
+                                self.transfered[(vertex,other_vertex)] += imageSize
+                                gotImage = True
+                            elif (other_vertex,vertex) in self.transfered:
+                                gotImage = True
+                                self.transfered[(other_vertex,vertex)] += imageSize
+            
+            self.fitness = 1000 / ((len(self.vertexlist)*imageSize) + sum([self.transfered[edge]/self.associated_population.graph.edges[edge[0],edge[1]]['capacity'] for edge in self.associated_population.graph.edges]))
             self.evaluated_fitness = True
-
+        
         return self.fitness
 
     # mutate the chromosome at a random index
@@ -131,10 +162,11 @@ class VertexCover:
 
 # class for the 'population' of vertex covers
 class Population:
-    def __init__(self, G, size):
+    def __init__(self, G, size, volume):
         self.vertexcovers = []
         self.size = size
         self.graph = G.copy()
+        self.imageSize = volume
 
         for vertex_cover_number in range(self.size):
             vertex_cover = VertexCover(self)
@@ -253,9 +285,9 @@ def crossover(parent1, parent2):
     child2.evaluate_fitness()
     return child1, child2
 
-def vertex_cover_genetic(G, res):
+def vertex_cover_genetic(G, res, imageSize):
     # initialise vertex cover population
-    population = Population(G, population_size)
+    population = Population(G, population_size, imageSize)
     population.evaluate_fitness_ranks()
     population.evaluate_diversity_ranks()
 
@@ -280,6 +312,10 @@ def vertex_cover_genetic(G, res):
     for vertex_cover in population.vertexcovers:
         if vertex_cover.fitness > best_fitness:
             best_vertex_cover = vertex_cover
+            best_fitness = vertex_cover.fitness
     list_mvc = best_vertex_cover.vertexlist.tolist()
     res.append(list_mvc)
+    res.append(best_fitness)
+    print(f"Best Fitness {best_fitness}")
+    res.append(best_vertex_cover.transfered)
     return (list_mvc,res)
