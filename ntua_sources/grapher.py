@@ -64,6 +64,10 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
     #plt.savefig(filename, dpi=400)
     plt.show()
     plt.clf()
+    
+def getScore(graph,placement):
+    score = len(placement) + sum([graph.edges[edge[0],edge[1]]['usage']/graph.edges[edge[0],edge[1]]['capacity'] for edge in graph.edges])
+    return score
 
 def create_continuum(size=10, degree=2, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
     # Graph creation
@@ -255,6 +259,7 @@ def create_continuum(size=10, degree=2, branching_factor_of_tree=4, height_of_tr
     # Nodes with image
     print(f"nodes nodes_with_image {nodes_with_image}")
     print ("Length of nodes with images", len(nodes_with_image))
+    print(f"Cost function value: {getScore(G2,nodes_with_image)}")
 
     #print("Approximation Ratio: ", "{:.2f}".format(len(nodes_with_image) / len(nodes_with_image_OPT)))
 
