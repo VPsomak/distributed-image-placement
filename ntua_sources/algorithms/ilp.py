@@ -57,7 +57,8 @@ class ilp_model:
         for edge in self.graph.edges:
             self.model += transfered[edge] <= self.volume*(activation[edge[0]]+activation[edge[1]])*self.graph.number_of_nodes()
             # self.model += transfered[edge] <= self.graph.edges[edge]['capacity']*(activation[edge[0]]+activation[edge[1]])*5
-        
+
+        #An = activation, self.volume = V , capacity W
         self.model += lpSum(
             [activation[n]*self.volume for n in self.graph] + 
             [transfered[edge]*(1/self.graph.edges[edge[0],edge[1]]['capacity']) for edge in self.graph.edges]

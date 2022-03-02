@@ -65,7 +65,7 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
     plt.show()
     plt.clf()
 
-def create_continuum(size=20, degree=2, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
+def create_continuum(size=10, degree=2, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
     # Graph creation
 
     if graph =="binomial_tree":
@@ -100,6 +100,8 @@ def create_continuum(size=20, degree=2, branching_factor_of_tree=4, height_of_tr
         else:
             edgeCapacities[edge] = bandwidthEthernet
 
+    print (G2.edges)
+
     # max-min fairness
     output = maxmin.max_min_fairness(demands=list(edgeCapacities.values()), capacity=20000000000)
     #print("OUTPUT -- max-min fairness", output)
@@ -114,12 +116,6 @@ def create_continuum(size=20, degree=2, branching_factor_of_tree=4, height_of_tr
     nx.set_edge_attributes(G2, values=0, name='usage')
     nx.set_edge_attributes(G2, values=0, name='time')
     nx.set_edge_attributes(G2, values=0, name='numImages')
-
-    # for edge in G2.edges:
-    #     print (edge)
-    # print (edgeCapacities)
-
-
 
 
     # Find the OPT solution first --------------------------------------
