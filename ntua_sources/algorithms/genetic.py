@@ -134,7 +134,7 @@ class VertexCover:
                                 gotImage = True
                                 self.transfered[(other_vertex,vertex)] += imageSize
             
-            self.fitness = 1000 / ((len(self.vertexlist)*imageSize) + sum([self.transfered[edge]/self.associated_population.graph.edges[edge[0],edge[1]]['capacity'] for edge in self.associated_population.graph.edges]))
+            self.fitness = 1000 / (len(self.vertexlist) + sum([self.transfered[edge]/self.associated_population.graph.edges[edge[0],edge[1]]['capacity'] for edge in self.associated_population.graph.edges]))
             self.evaluated_fitness = True
         
         return self.fitness
