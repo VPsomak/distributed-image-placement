@@ -65,7 +65,7 @@ def draw_continuum(filename: string, color_map, graph, mode=None):
     plt.show()
     plt.clf()
 
-def create_continuum(size=10, degree=2, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
+def create_continuum(size=8, degree=2, branching_factor_of_tree=4, height_of_tree=2, knearest=7, probability=0.7):
     # Graph creation
 
     if graph =="binomial_tree":
@@ -257,7 +257,6 @@ def create_continuum(size=10, degree=2, branching_factor_of_tree=4, height_of_tr
     print ("Length of nodes with images", len(nodes_with_image))
 
     #print("Approximation Ratio: ", "{:.2f}".format(len(nodes_with_image) / len(nodes_with_image_OPT)))
-
     # print ("Length of min_weighted_vertex_cover", len(approximation.vertex_cover.min_weighted_vertex_cover(G2)))
     # approximation_ratio = "{:.2f}".format(len(nodes_with_image) / len(approximation.vertex_cover.min_weighted_vertex_cover(G2)))
     # print ("Approximation Ratio: ",approximation_ratio)
