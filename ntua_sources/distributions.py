@@ -6,6 +6,7 @@ from numpy import random
 import matplotlib.pyplot as plt
 import numpy
 import sys
+import math
 
 
 # graph vertexes size
@@ -23,8 +24,8 @@ for i in range(100):
     r = random()
     x_smp = x_min * (1 - r) ** (-1 / (alpha - 1))
     x_discrete.append(round(x_smp))
-# print("\nPower law dist")
-# print (x_discrete)
+print("\nPower law dist")
+print (sorted(set(x_discrete)))
 
 # binomial distribution
 # Syntax = np.random.binomial(n,p, size=None)
@@ -40,8 +41,9 @@ for i in range(len(bin)):
 # Syntax = np.random.normal(loc=0.0, scale=1.0, size=None)
 # loc = mean of distribution, scale = standard deviation, size = output size
 normal_dist_list =[]
-print("\nNormal dist")
+#print("\nNormal dist")
 x = np.random.normal(40,10,50)
 for i in range(len(x)):
     normal_dist_list.append(round(x[i]))
-print (sorted(set(normal_dist_list)))
+#print (sorted(set(normal_dist_list)))
+
