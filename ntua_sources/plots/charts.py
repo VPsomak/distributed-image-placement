@@ -152,6 +152,54 @@ def costfunction_all_Algorithms_BarabasiAlbert():
     plt.tight_layout()
     plt.show()
 
+def costfunction_all_Algorithms_Binomial():
+    sns.set_style("ticks")
+    data = [["2",2,1.16,1.16, 1.16 ],
+            ["4",4,125.04,125.04,125.04 ],
+            ["8",8,250.73,250.73,250.73],
+            ["16",16,382.19,382.19,382.19 ],
+            ["32",32,1500.48,1503.81,1503.81 ],
+            ["64",64,3217.71,3623.29	,3371.40 ],
+            ["128",128,6510.32	,7171.00	,6510.04 ],
+            ["256",256,12099.31,14766.39,12099.31 ],
+            ["512",512,27427.64,34354.79	,27427.64 ],
+            ["1024",1024,84872.029,108433.52	,84872.03 ],
+            ]
+
+    df = pd.DataFrame(data, columns=["Number of Vertices", "Approximation", "Greedy", "Genetic", "ILP"])
+    df.plot(x="Number of Vertices", y=["Approximation", "Greedy", "Genetic", "ILP"],
+            kind="bar", figsize=(9, 8), color=['lightsteelblue', 'cornflowerblue', 'dimgray', 'peru', 'cyan'])
+    plt.xticks(rotation=0)
+    plt.title("Binomial Tree")
+    plt.ylabel("Cost Function")
+    plt.yscale('log')
+    plt.tight_layout()
+    plt.show()
+
+def costfunction_all_Algorithms_Star():
+    sns.set_style("ticks")
+    data = [["2",2.0,	1.161,	1.161,		1.161 ],
+            ["4",125.04	,246.92	,246.92	,246.92 ],
+            ["8",372.097,493.97	,493.97	,493.97 ],
+            ["16",990.11,1235.35,1235.35	,1235.35 ],
+            ["32",2607.007	,2728.88	,2728.88	,2728.88 ],
+            ["64",5630.31,5752.19,5752.19	,5752.19],
+            ["128", 5630.31	,12639.10,	12639.10,		12639.10],
+            ["256", 24003.90	,24125.78,	24125.78,		24125.78],
+            ["512",  53895.35,	54017.23,	54017.23		,54017.23],
+            ["1024",168392.52,	168556.29	,168556.29,		168556.29 ],
+            ]
+
+    df = pd.DataFrame(data, columns=["Number of Vertices", "Approximation", "Greedy", "Genetic", "ILP"])
+    df.plot(x="Number of Vertices", y=["Approximation", "Greedy", "Genetic", "ILP"],
+            kind="bar", figsize=(9, 8), color=['lightsteelblue', 'cornflowerblue', 'dimgray', 'peru', 'cyan'])
+    plt.xticks(rotation=0)
+    plt.title("Star Graph")
+    plt.ylabel("Cost Function")
+    plt.yscale('log')
+    plt.tight_layout()
+    plt.show()
+
 
 ########################################################################################################################
 ########################################################################################################################
@@ -183,6 +231,32 @@ def  NumberofNodesinVC_all_Algorithms_BarabasiAlbert():
     # plt.yscale('log')
     plt.tight_layout()
     plt.show()
+
+# TODO
+# def NumberofNodesinVC_all_Algorithms_Balanced():
+#     # r = 2 -- h = increased by 1 in every run, starts with 1
+#     sns.set_style("ticks")
+#     data = [["2",2,1,1,1 ],
+#             ["4",2,1,1,1 ],
+#             ["8",10,6,8,5 ],
+#             ["16",20,10,16,10 ],
+#             ["32",42,26,36,20 ],
+#             ["64",,,, ],
+#             ["128",,,, ],
+#             ["256",,,, ],
+#             ["512",,,, ],
+#             ["1024",,,, ],
+#             ]
+#
+#     df = pd.DataFrame(data, columns=["Number of Vertices", "Approximation", "Greedy", "Genetic", "ILP"])
+#     df.plot(x="Number of Vertices", y=["Approximation", "Greedy", "Genetic", "ILP"],
+#             kind="bar", figsize=(9, 8), color=['lightsteelblue', 'cornflowerblue', 'dimgray', 'peru', 'cyan'])
+#     plt.xticks(rotation=0)
+#     plt.title("Balanced Tree")
+#     plt.ylabel("Number of nodes in VC")
+#     # plt.yscale('log')
+#     plt.tight_layout()
+#     plt.show()
 
 
 ########################################################################################################################
@@ -364,6 +438,68 @@ def costfunction_all_NetworkStructures_for_Approximation():
 
     plt.show()
 
+def costfunction_all_NetworkStructures_for_Greedy():
+    sns.set_style("ticks")
+
+    data = [["2",124.04,1.161,1.16,0,1.161,1.16 ],
+            ["4",124.04,246.92,125.04,0,125.52,125.04 ],
+            ["8",371.28,493.97,250.73,0,252.75, 372.65],
+            ["16",745.11,1235.35,382.19,388.85,747.28,748.45 ],
+            ["32",1746.77,2728.88,1500.48,1158.90,1388.81,1753.92 ],
+            ["64",3269.75,5752.19,3217.71,1708.70,2821.53, 4732.42 ],
+            ["128",8583.57,12639.10,6510.32,5041.98,5147.98,8244.56 ],
+            ["256",13074.54,24125.78,12099.31,23343.71,11187.54,16346.34 ],
+            ["512", 36131.69,54017.23,27427.64,110230.25,27571.52,36592.49],
+            ["1024",98694.95,168556.29,84872.029,440389.58,109849.121,116151.27 ],
+            ]
+
+    df = pd.DataFrame(data, columns=["Number of Vertices", "Greedy (Balanced Tree)", "Greedy (Star)",
+                                     "Greedy (Binomial)", "Greedy (Erdo-Renyi)",
+                                     "Greedy (Watts–Strogatz)", "Greedy (Barabasi-Albert)"])
+    df.plot(x="Number of Vertices",
+            y=["Greedy (Balanced Tree)", "Greedy (Star)", "Greedy (Binomial)",
+               "Greedy (Erdo-Renyi)", "Greedy (Watts–Strogatz)", "Greedy (Barabasi-Albert)"],
+            kind="bar",
+            figsize=(9, 8), color=['lightsteelblue', 'cornflowerblue', 'dimgray', 'peru', 'powderblue', 'silver'])
+    plt.xticks(rotation=0)
+    plt.title("Greedy")
+    plt.ylabel("Cost Function")
+    plt.yscale('log')
+    plt.tight_layout()
+
+    plt.show()
+
+def costfunction_all_NetworkStructures_for_Genetic():
+    sns.set_style("ticks")
+
+    data = [["2", 124.04,1.161,1.16,0,1.161,1.16 ],
+            ["4",124.04,246.92,125.04,0,3.3233,125.04 ],
+            ["8",249.40,493.97,250.73,0,129.09,372.65 ],
+            ["16",624.23,1235.35,382.19,147.86,148.84,748.45 ],
+            ["32",1506.15,2728.88,1503.81,1086.42,1273.89, 1753.92],
+            ["64",3400.336,5752.19,3623.29,3498.15,2514.96,4734.80 ],
+            ["128",8012.42,12639.10,7171.00,23480.76,6212.21,8393.66 ],
+            ["256",15039.79,24125.78,14766.39,229235.27,14206.98,17062.14 ],
+            ["512",35542.64,54017.23,34354.79,1942119.08,35845.13,39449.045 ],
+            ["1024",114932.21,168556.29,108433.52,16359885.61,149304.38,124501.55 ],
+            ]
+
+    df = pd.DataFrame(data, columns=["Number of Vertices", "Genetic (Balanced Tree)", "Genetic (Star)",
+                                     "Genetic (Binomial)", "Genetic (Erdo-Renyi)",
+                                     "Genetic (Watts–Strogatz)", "Genetic (Barabasi-Albert)"])
+    df.plot(x="Number of Vertices",
+            y=["Genetic (Balanced Tree)", "Genetic (Star)", "Genetic (Binomial)",
+               "Genetic (Erdo-Renyi)", "Genetic (Watts–Strogatz)", "Genetic (Barabasi-Albert)"],
+            kind="bar",
+            figsize=(9, 8), color=['lightsteelblue', 'cornflowerblue', 'dimgray', 'peru', 'powderblue', 'silver'])
+    plt.xticks(rotation=0)
+    plt.title("Genetic")
+    plt.ylabel("Cost Function")
+    plt.yscale('log')
+    plt.tight_layout()
+
+    plt.show()
+
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
@@ -474,12 +610,17 @@ if __name__ == '__main__':
     ########################################################################################################################
 
     ## Cost Function all Algorithms for the various Network Topologies ###################################################
-    costfunction_all_Algorithms_BarabasiAlbert()
+    #costfunction_all_Algorithms_BarabasiAlbert()
+    #costfunction_all_Algorithms_Binomial()
+    #costfunction_all_Algorithms_Star()
     ########################################################################################################################
     ########################################################################################################################
 
     ## NumberofNodesinVC all Algorithms for the various Network Topologies ###################################################
-    NumberofNodesinVC_all_Algorithms_BarabasiAlbert()
+    # NumberofNodesinVC_all_Algorithms_BarabasiAlbert()
+    # NumberofNodesinVC_all_Algorithms_Balanced()
+    # NumberofNodesinVC_all_Algorithms_Star() -> DOES NOT NEED
+    # NumberofNodesinVC_all_Algorithms_Binomial() -> DOES NOT NEED
     ########################################################################################################################
     ########################################################################################################################
 
@@ -489,7 +630,7 @@ if __name__ == '__main__':
 
 
     ## Execution Times all Network Structures for the various Algorithms ###################################################
-    execution_time_all_NetworkStructures_for_Approximation()
+    # execution_time_all_NetworkStructures_for_Approximation()
     # execution_time_all_NetworkStructures_for_Greedy()
     # execution_time_all_NetworkStructures_for_Genetic()
     ########################################################################################################################
@@ -497,6 +638,8 @@ if __name__ == '__main__':
 
     ## Cost Function all Network Structures for the various Algorithms #####################################################
     # costfunction_all_NetworkStructures_for_Approximation()
+    # costfunction_all_NetworkStructures_for_Greedy()
+    #costfunction_all_NetworkStructures_for_Genetic()
     ########################################################################################################################
     ########################################################################################################################
 
@@ -508,6 +651,6 @@ if __name__ == '__main__':
 
 
 
-    # barabasi_m1_lineplot()
+    #barabasi_m1_lineplot()
 
 
