@@ -304,7 +304,55 @@ def  NumberofNodesinVC_all_Algorithms_BarabasiAlbert():
 
 
 
+## ApproximationRatio all Algorithms for the various Network Topologies ###################################################
 
+def ApproximationRatio_all_Algorithms_Binomial():
+    y1 = [2,2,2,2,2,2,2,2,2,2]
+    y2 = [1,1,1,1,1,1,1,1,1,1]
+    y3 = [1,1,1,1,1,1,1,1,1,1]
+
+    x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+
+    sns.set_style("ticks")
+    plt.plot(x, y1, "-+", label="Approximation", color="lightsteelblue")
+    plt.plot(x, y2, "-o", label="Greedy", color="cornflowerblue")
+    plt.plot(x, y3, "-*", label="Genetic", color="dimgray")
+    #plt.plot(x, y4, "--", label="ILP", color="peru")
+    plt.legend(loc="upper left")
+    plt.xlabel("Number of Vertices")
+    plt.ylabel("Execution time (seconds)")
+    plt.title("Binomial Tree")
+    plt.tight_layout()
+    #plt.yscale('log')
+    plt.tight_layout()
+    plt.show()
+
+def ApproximationRatio_all_Algorithms_Barabasi():
+    y1 = [2, 2, 2, 1.6, 1.77, 1.64, 1.76, 1.61, 1.72, 1.71]
+    y2 = [1, 1, 1, 1.2, 1.11, 1.05, 1.08, 1.02, 1.03, 1.02]
+    y3 = [1, 1, 1, 1.2, 1.11, 1.11, 1.38, 1.26, 1.37, 1.38]
+
+    x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+
+    sns.set_style("ticks")
+    plt.plot(x, y1, "-+", label="Approximation", color="lightsteelblue")
+    plt.plot(x, y2, "-o", label="Greedy", color="cornflowerblue")
+    plt.plot(x, y3, "-*", label="Genetic", color="dimgray")
+    # plt.plot(x, y4, "--", label="ILP", color="peru")
+    plt.legend(loc="upper left")
+    plt.xlabel("Number of Vertices")
+    plt.ylabel("Execution time (seconds)")
+    plt.title("Barabasi-Albert Graph")
+    plt.tight_layout()
+    # plt.yscale('log')
+    plt.tight_layout()
+    plt.show()
+
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
 
 
@@ -359,7 +407,6 @@ def execution_time_all_NetworkStructures_for_Approximation():
     plt.yscale('log')
     plt.tight_layout()
     plt.show()
-
 
 def execution_time_all_NetworkStructures_for_Approximation_LINE():
     y1 = [0.00012,0.00012,0.00013,0.00034,0.0012,0.0221,0.0387,0.0977,0.444,1.993]
@@ -641,8 +688,8 @@ def NumberofNodesinVC_all_NetworkStructures_for_Approximation():
                                      "Binomial", "Erdo-Renyi",
                                      "Watts–Strogatz", "Barabasi-Albert"])
     df.plot(x="Number of Vertices",
-            y=["Approximation (Balanced Tree)", "Approximation (Star)", "Approximation (Binomial)",
-               "Approximation (Erdo-Renyi)", "Approximation (Watts–Strogatz)", "Approximation (Barabasi-Albert)"],
+            y=["Balanced Tree", "Star", "Binomial",
+               "Erdo-Renyi", "Watts–Strogatz", "Barabasi-Albert"],
             kind="bar",
             figsize=(9, 8), color=['lightsteelblue', 'cornflowerblue', 'dimgray', 'peru', 'powderblue', 'silver'])
     plt.xticks(rotation=0)
@@ -748,16 +795,146 @@ def barabasi_m1_lineplot():
     plt.savefig("dtw_per.pdf", dpi=300)
 
 
+def vertices_and_edges_of_various_graph_topologies():
+    sns.set_style("ticks")
+
+    data = [["2", 1, 1, 1,                  0,     1, 1],
+            ["4", 2, 3, 3,                  0,     5, 3],
+            ["8", 6, 7, 7,                  0,     12, 7],
+            ["16", 14, 15, 15,              25,    23, 15],
+            ["32", 30, 31, 31,              105,   48, 31],
+            ["64", 62, 63, 63,              394,   99, 63],
+            ["128", 126, 127, 127,          1612,  191, 127],
+            ["256", 254, 255, 255,          6522,  400, 255],
+            ["512", 510, 511, 511,          26207, 763, 511],
+            ["1024", 1022, 1023, 1023,      104927,1528, 1023],
+            ]
+
+    df = pd.DataFrame(data, columns=["Number of Vertices", "Balanced Tree", "Star",
+                                     "Binomial", "Erdo-Renyi",
+                                     "Watts–Strogatz", "Barabasi-Albert"])
+    df.plot(x="Number of Vertices",
+            y=["Balanced Tree", "Star", "Binomial",
+               "Erdo-Renyi", "Watts–Strogatz", "Barabasi-Albert"],
+            kind="bar",
+            figsize=(9, 8), color=['lightsteelblue', 'cornflowerblue', 'dimgray', 'peru', 'powderblue', 'silver'])
+    plt.xticks(rotation=0)
+    plt.title("Vertices and Edges")
+    plt.ylabel("Edges")
+    plt.ylim(0, 1700)
+    #plt.yscale('log')
+    plt.tight_layout()
+
+    plt.show()
+
+
+def vertex_edges_ErdosRenyi_probability():
+    y1 = [1,3,7, 25, 105, 394, 1612, 6522, 26207, 104927]
+    y2 = [1,3,11,66,248,1003, 4054, 16331, 65574, 262255]
+    y3 = [1,4,20,94,360,1417,5712,22951,91762,366916]
+
+    x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+
+    sns.set_style("ticks")
+    plt.plot(x, y1, "-+", label="p=0.2", color="gray")
+    plt.plot(x, y2, "-o", label="p=0.5", color="gray")
+    plt.plot(x, y3, "-*", label="p=0.7", color="gray")
+    # plt.plot(x, y4, "--", label="ILP", color="peru")
+    plt.legend(loc="upper left")
+    plt.xlabel("Number of Vertices")
+    plt.ylabel("Number of Edges")
+    plt.title("Erdo-Renyi")
+    plt.tight_layout()
+    # plt.yscale('log')
+    plt.tight_layout()
+    plt.show()
+
+
+def vertex_edges_WattsStrogatz_degree():
+    y1 = [1,5,12,23,48,99,191,400,763,1528]
+    y2 = [0,6,24,49,101,194,389,764,1529,3072]
+    y3 = [0,0,28,76,146,287,580,1144,2303,4635]
+
+    x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+
+    sns.set_style("ticks")
+    plt.plot(x, y1, "-+", label="k(L)=2", color="gray")
+    plt.plot(x, y2, "-o", label="k(L)=4", color="gray")
+    plt.plot(x, y3, "-*", label="k(L)=7", color="gray")
+    # plt.plot(x, y4, "--", label="ILP", color="peru")
+    plt.legend(loc="upper left")
+    plt.xlabel("Number of Vertices")
+    plt.ylabel("Number of Edges")
+    plt.title("Watts-Strogatz")
+    plt.tight_layout()
+    # plt.yscale('log')
+    plt.tight_layout()
+    plt.show()
+
+def vertex_edges_Barabasi_degree():
+    y1 = [1,3,7,15,31,63,127,255,511,1023]
+    y2 = [0,3,15,39,87,183,375,759,1527,3063]
+    y3 = [0,3,15,64,192,448,960,1984,4032,8128]
+
+    x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+
+    sns.set_style("ticks")
+    plt.plot(x, y1, "-+", label="m=1", color="gray")
+    plt.plot(x, y2, "-o", label="m=3", color="gray")
+    plt.plot(x, y3, "-*", label="m=8", color="gray")
+    # plt.plot(x, y4, "--", label="ILP", color="peru")
+    plt.legend(loc="upper left")
+    plt.xlabel("Number of Vertices")
+    plt.ylabel("Number of Edges")
+    plt.title("Barabasi-Albert")
+    plt.tight_layout()
+    # plt.yscale('log')
+    plt.tight_layout()
+    plt.show()
+
+# def vertex_edges_BalancedTree():
+#     y1 = [1, 3, 7, 15, 31, 63, 127, 255, 511, 1023]
+#     y2 = [0, 3, 15, 39, 87, 183, 375, 759, 1527, 3063]
+#     y3 = [0, 3, 15, 64, 192, 448, 960, 1984, 4032, 8128]
+#
+#     x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+#
+#     sns.set_style("ticks")
+#     plt.plot(x, y1, "-+", label="BT-r_{2}", color="gray")
+#     plt.plot(x, y2, "-o", label="BT-r_{3}", color="gray")
+#     plt.plot(x, y3, "-*", label="BT-r_{5}", color="gray")
+#     plt.plot(x, y4, "--", label="BT-h_{2}", color="gray")
+#     plt.plot(x, y5, "-v", label="BT-h_{4}", color="gray")
+#     plt.legend(loc="upper left")
+#     plt.xlabel("Number of Vertices")
+#     plt.ylabel("Number of Edges")
+#     plt.title("Balanced Tree")
+#     plt.tight_layout()
+#     # plt.yscale('log')
+#     plt.tight_layout()
+#     plt.show()
+
 
 
 if __name__ == '__main__':
-    # barabasi_m1_lineplot()
+    # miscellaneous
+    #vertices_and_edges_of_various_graph_topologies()
+    #vertex_edges_ErdosRenyi_probability()
+    #vertex_edges_WattsStrogatz_degree()
+    #vertex_edges_Barabasi_degree()
+    #barabasi_m1_lineplot()
+    vertex_edges_BalancedTree()
+
+
+    #---------------------------------------------------------------------------------------------------------------------------
+
+
     ## Execution Times all Algorithms for the various Network Topologies ###################################################
     #execution_time_all_Algorithms_Binomial()
     #execution_time_all_Algorithms_Binomial_LINE()
     # execution_time_all_Algorithms_Balanced()
-    # execution_time_all_Algorithms_Star()
-    # execution_time_all_Algorithms_Star_LINE()
+    #execution_time_all_Algorithms_Star()
+    #execution_time_all_Algorithms_Star_LINE()
     # execution_time_all_Algorithms_BarabasiAlbert()
     #execution_time_all_Algorithms_BarabasiAlbert_LINE()
     ########################################################################################################################
@@ -771,15 +948,36 @@ if __name__ == '__main__':
     ########################################################################################################################
 
     ## NumberofNodesinVC all Algorithms for the various Network Topologies ###################################################
-    # NumberofNodesinVC_all_Algorithms_BarabasiAlbert()
-    # NumberofNodesinVC_all_Algorithms_Balanced()
+    #NumberofNodesinVC_all_Algorithms_BarabasiAlbert()
+    #NumberofNodesinVC_all_Algorithms_Balanced()
     # NumberofNodesinVC_all_Algorithms_Star() -> DOES NOT NEED
     # NumberofNodesinVC_all_Algorithms_Binomial() -> DOES NOT NEED
     ########################################################################################################################
     ########################################################################################################################
 
+    ## ApproximationRatio all Algorithms for the various Network Topologies ###################################################
+    #ApproximationRatio_all_Algorithms_Binomial()
+    #ApproximationRatio_all_Algorithms_Star() -> Not needed, it is the same as binomial
+    #ApproximationRatio_all_Algorithms_Barabasi()
+    ########################################################################################################################
+    ########################################################################################################################
+
+
+
+
+
+
+
+
 
     #-------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
 
 
 
@@ -787,16 +985,16 @@ if __name__ == '__main__':
     # execution_time_all_NetworkStructures_for_Approximation()
     #execution_time_all_NetworkStructures_for_Approximation_LINE()
     # execution_time_all_NetworkStructures_for_Greedy()
-    # execution_time_all_NetworkStructures_for_Greedy_LINE()
+    #execution_time_all_NetworkStructures_for_Greedy_LINE()
     # execution_time_all_NetworkStructures_for_Genetic()
-    execution_time_all_NetworkStructures_for_Genetic_LINE()
+    #execution_time_all_NetworkStructures_for_Genetic_LINE()
     ########################################################################################################################
     ########################################################################################################################
 
     ## Cost Function all Network Structures for the various Algorithms #####################################################
-    # costfunction_all_NetworkStructures_for_Approximation()
-    # costfunction_all_NetworkStructures_for_Greedy()
-    # costfunction_all_NetworkStructures_for_Genetic()
+    #costfunction_all_NetworkStructures_for_Approximation()
+    #costfunction_all_NetworkStructures_for_Greedy()
+    #costfunction_all_NetworkStructures_for_Genetic()
     ########################################################################################################################
     ########################################################################################################################
 
@@ -810,6 +1008,6 @@ if __name__ == '__main__':
 
 
 
-    #barabasi_m1_lineplot()
+
 
 
