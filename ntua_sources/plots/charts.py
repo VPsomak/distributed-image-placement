@@ -528,7 +528,37 @@ def execution_time_all_NetworkStructures_for_Genetic_LINE():
     plt.yscale('log')
     plt.tight_layout()
     plt.show()
-    #plt.savefig("genetic_SC.pdf", dpi=300)
+
+def execution_time_all_NetworkStructures_for_ILP_LINE():
+    y1 = [0.01232,0.01232,0.01090,0.0143,0.02719,0.0859,1.309,1.443]
+    y2 = [ 0.00853,0.01267, 0.01389,0.0148,0.0182,0.0259,0.0677,0.1094,0.2276, 0.6835]
+    y3 = [0.0594,0.014,0.0125,0.0141,0.0223,0.0317,0.0742,0.1210,0.505,1.32]
+    y4 = [0,0,0,2813.12,4812.04]
+    y5 = [0.0451,0.0178,0.0299,57.37,2453.32]
+    y6 = [0.0099,0.0126,0.0190,0.0215,0.0378,0.0363,0.0782,0.1587,0.6933,1.310]
+
+    x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+    x0 = [2, 4, 8, 16, 32, 64, 128, 256]
+    x1 = [2, 4, 8, 16, 32]
+
+    sns.set_style("ticks")
+    plt.plot(x0, y1, "-+", label="Balanced Tree", color="lightsteelblue")
+    plt.plot(x, y2, "-o", label="Star", color="cornflowerblue")
+    plt.plot(x, y3, "-*", label="Binomial", color="dimgray")
+    plt.plot(x1, y4, "--", label="Erdo-Renyi", color="peru")
+    plt.plot(x1, y5, "-p", label="Watts-Strogatz", color="powderblue")
+    plt.plot(x, y6, "-.", label="Barabasi-Albert", color="silver")
+    plt.legend(loc="upper left")
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.title("ILP", fontsize=18)
+    plt.ylabel("Execution time (seconds)", fontsize=18)
+    plt.xlabel("Number of Vertices", fontsize=18)
+    plt.legend(fontsize=15)
+    plt.yscale('log')
+    plt.tight_layout()
+    plt.show()
+
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
@@ -637,6 +667,41 @@ def costfunction_all_NetworkStructures_for_Genetic():
     plt.xticks(rotation=0, fontsize=16)
     plt.yticks(fontsize=16)
     plt.title("Genetic", fontsize=20)
+    plt.ylabel("Cost Function", fontsize=20)
+    plt.xlabel("Number of Vertices", fontsize=20)
+    plt.legend(fontsize=16)
+    plt.yscale('log')
+    plt.tight_layout()
+
+    plt.show()
+
+def costfunction_all_NetworkStructures_for_ILP():
+    sns.set_style("ticks")
+
+    data = [["2", 124.04,124.04,1.161, 1.16,0,1.161,],
+            ["4", 124.04,246.92,125.04,0,124.84,125.04],
+            ["8", 371.287,493.97,250.73,0,494.79,372.65],
+            ["16", 745.73,1235.35,382.19,516.82,632.51,870.33],
+            ["32", 1745.06,2728.88,1503.81,1706.56,1712.23,1756.54],
+            ["64", 3770.035,5752.19,3371.40,0,0,4854.30],
+            ["128",8527.22 ,12639.10,6510.04,0,0,8280.75],
+            ["256", 15417.41,24125.78,12099.31,0,0,16260.24],
+            ["512", 0,54017.23,27427.64,0,0,36950.95],
+            ["1024",0 ,168556.29,84872.03,0,0,117625.16],
+            ]
+
+    df = pd.DataFrame(data, columns=["Number of Vertices", "Balanced Tree", "Star",
+                                     "Binomial", "Erdo-Renyi",
+                                     "Watts–Strogatz", "Barabasi-Albert"])
+    df.plot(x="Number of Vertices",
+            y=["Balanced Tree", "Star", "Binomial",
+               "Erdo-Renyi", "Watts–Strogatz", "Barabasi-Albert"],
+            kind="bar",
+            figsize=(9, 8), color=['lightsteelblue', 'cornflowerblue', 'dimgray', 'peru', 'powderblue', 'silver'],
+            width=0.6)
+    plt.xticks(rotation=0, fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.title("ILP", fontsize=20)
     plt.ylabel("Cost Function", fontsize=20)
     plt.xlabel("Number of Vertices", fontsize=20)
     plt.legend(fontsize=16)
@@ -762,6 +827,40 @@ def NumberofNodesinVC_all_NetworkStructures_for_Genetic():
 
     plt.show()
 
+def NumberofNodesinVC_all_NetworkStructures_for_ILP():
+    sns.set_style("ticks")
+
+    data = [["2", 1, 1, 1, 0, 1, 1],
+            ["4", 1,1,2,0,1,2],
+            ["8", 2,1,4,0,2,3],
+            ["16", 5,1,8,3,5,5],
+            ["32", 10,1,16,6,11,9],
+            ["64", 20,1,32,0,0,17],
+            ["128", 38,1,64,0,0,34],
+            ["256", 81,1,128,0,0,78],
+            ["512", 0,1,256,0,0,158],
+            ["1024", 0,1,512,0,0,312],
+            ]
+
+    df = pd.DataFrame(data, columns=["Number of Vertices", "Balanced Tree", "Star",
+                                     "Binomial", "Erdo-Renyi",
+                                     "Watts–Strogatz", "Barabasi-Albert"])
+    df.plot(x="Number of Vertices",
+            y=["Balanced Tree", "Star", "Binomial",
+               "Erdo-Renyi", "Watts–Strogatz", "Barabasi-Albert"],
+            kind="bar",
+            figsize=(9, 8), color=['lightsteelblue', 'cornflowerblue', 'dimgray', 'peru', 'powderblue', 'silver'],
+            width=0.6)
+    plt.xticks(rotation=0, fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.title("ILP", fontsize=20)
+    plt.ylabel("VC Set", fontsize=20)
+    plt.xlabel("Number of Vertices", fontsize=20)
+    plt.legend(fontsize=16)
+    plt.yscale('log')
+    plt.tight_layout()
+
+    plt.show()
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
@@ -771,21 +870,24 @@ def NumberofNodesinVC_all_NetworkStructures_for_Genetic():
 # ApproximationRatio all Network Structures for the various Algorithms ###############################################
 def ApproximationRatio_all_NetworkStructures_for_Approximation():
     # replaxe zeros
-    y1 = [2,2,2,2,2,2.1,2.2,2.09,0,0]
+    y1 = [2,2,2,2,2,2.1,2.2,2.09]
     y2 = [2,2,2,2,2,2,2,2,2,2]
     y3 = [2,2,2,2,2,2,2,2,2,2]
-    y4 = [0,0,0,0,0,0,0,0,0,0]
-    y5 = [2,4,4,0,0,0,0,0,0,0]
+    y4 = [4.6,4.6]
+    y5 = [2,4,4,3.2,2.9]
     y6 = [2,2,2,1.6,1.7,1.6,1.7,1.6,1.7,1.7]
 
     x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+    x0 = [2, 4, 8, 16, 32, 64, 128, 256]
+    x1 = [16, 32]
+    x2 = [2, 4, 8, 16, 32]
 
     sns.set_style("ticks")
-    plt.plot(x, y1, "-+", label="Balanced Tree", color="lightsteelblue")
+    plt.plot(x0, y1, "-+", label="Balanced Tree", color="lightsteelblue")
     plt.plot(x, y2, "-o", label="Star", color="cornflowerblue")
     plt.plot(x, y3, "-*", label="Binomial", color="dimgray")
-    plt.plot(x, y4, "--", label="Erdo-Renyi", color="peru")
-    plt.plot(x, y5, "-p", label="Watts-Strogatz", color="powderblue")
+    plt.plot(x1, y4, "--", label="Erdo-Renyi", color="peru")
+    plt.plot(x2, y5, "-p", label="Watts-Strogatz", color="powderblue")
     plt.plot(x, y6, "-.", label="Barabasi-Albert", color="silver")
     plt.legend(loc="upper left")
 
@@ -801,21 +903,25 @@ def ApproximationRatio_all_NetworkStructures_for_Approximation():
 
 def ApproximationRatio_all_NetworkStructures_for_Greedy():
     # replaxe zeros
-    y1 = [1,1,1,1.2,1,1.3,1.5,1.3,0,0]
+    y1 = [1,1,1,1.2,1,1.3,1.5,1.3]
     y2 = [1,1,1,1,1,1,1,1,1,1]
     y3 = [1,1,1,1,1,1,1,1,1,1]
-    y4 = [0,0,0,0,0,0,0,0,0,0]
-    y5 = [1,2,2,0,0,0,0,0,0,0]
+    y4 = [3,3.5]
+    y5 = [1,2,2,2,1.6]
     y6 = [1,1,1,1.2,1.1,1.05,1.08,1.02,1.03,1.02]
 
+
     x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+    x0 = [2, 4, 8, 16, 32, 64, 128, 256]
+    x1 = [16, 32]
+    x2 = [2, 4, 8, 16, 32]
 
     sns.set_style("ticks")
-    plt.plot(x, y1, "-+", label="Balanced Tree", color="lightsteelblue")
+    plt.plot(x0, y1, "-+", label="Balanced Tree", color="lightsteelblue")
     plt.plot(x, y2, "-o", label="Star", color="cornflowerblue")
     plt.plot(x, y3, "-*", label="Binomial", color="dimgray")
-    plt.plot(x, y4, "--", label="Erdo-Renyi", color="peru")
-    plt.plot(x, y5, "-p", label="Watts-Strogatz", color="powderblue")
+    plt.plot(x1, y4, "--", label="Erdo-Renyi", color="peru")
+    plt.plot(x2, y5, "-p", label="Watts-Strogatz", color="powderblue")
     plt.plot(x, y6, "-.", label="Barabasi-Albert", color="silver")
     plt.legend(loc="upper left")
 
@@ -832,27 +938,63 @@ def ApproximationRatio_all_NetworkStructures_for_Greedy():
 
 def ApproximationRatio_all_NetworkStructures_for_Genetic():
     # replaxe zeros
-    y1 = [1, 1, 1.5, 1.6, 1.6, 1.8, 1.7, 1.7, 0, 0]
+    y1 = [1, 1, 1.5, 1.6, 1.6, 1.8, 1.7, 1.7]
     y2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     y3 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    y4 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    y5 = [1, 3, 3, 0, 0, 0, 0, 0, 0, 0]
+    y4 = [3.6,4.1]
+    y5 = [1, 1, 3, 2.4, 1.9]
     y6 = [1.16, 1, 1, 1.2, 1.1, 1.1, 1.38, 1.26, 1.37, 1.38]
 
     x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+    x0 = [2, 4, 8, 16, 32, 64, 128, 256]
+    x1 = [16,32]
+    x2 = [2, 4, 8, 16, 32]
 
     sns.set_style("ticks")
-    plt.plot(x, y1, "-+", label="Balanced Tree", color="lightsteelblue")
+    plt.plot(x0, y1, "-+", label="Balanced Tree", color="lightsteelblue")
     plt.plot(x, y2, "-o", label="Star", color="cornflowerblue")
     plt.plot(x, y3, "-*", label="Binomial", color="dimgray")
-    plt.plot(x, y4, "--", label="Erdo-Renyi", color="peru")
-    plt.plot(x, y5, "-p", label="Watts-Strogatz", color="powderblue")
+    plt.plot(x1, y4, "--", label="Erdo-Renyi", color="peru")
+    plt.plot(x2, y5, "-p", label="Watts-Strogatz", color="powderblue")
     plt.plot(x, y6, "-.", label="Barabasi-Albert", color="silver")
     plt.legend(loc="upper left")
 
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
-    plt.title("Greedy", fontsize=18)
+    plt.title("Genetic", fontsize=18)
+    plt.ylabel("Approximation Ratio", fontsize=18)
+    plt.xlabel("Number of Vertices", fontsize=18)
+    plt.legend(fontsize=15)
+    # plt.yscale('log')
+    plt.tight_layout()
+    plt.show()
+
+def ApproximationRatio_all_NetworkStructures_for_ILP():
+    # replaxe zeros
+    y1 = [1, 1, 1.5, 1.6, 1.6, 1.8, 1.7, 1.7]
+    y2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    y3 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    y4 = [3, 6]
+    y5 = [1, 1, 2, 5, 11]
+    y6 = [1.16, 1, 1, 1.2, 1.1, 1.1, 1.38, 1.26, 1.37, 1.38]
+
+    x = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+    x0 = [16, 32]
+    x1=[2, 4, 8, 16, 32]
+    x2=[2, 4, 8, 16, 32, 64, 128, 256]
+
+    sns.set_style("ticks")
+    plt.plot(x2, y1, "-+", label="Balanced Tree", color="lightsteelblue")
+    plt.plot(x, y2, "-o", label="Star", color="cornflowerblue")
+    plt.plot(x, y3, "-*", label="Binomial", color="dimgray")
+    plt.plot(x0, y4, "--", label="Erdo-Renyi", color="peru")
+    plt.plot(x1, y5, "-p", label="Watts-Strogatz", color="powderblue")
+    plt.plot(x, y6, "-.", label="Barabasi-Albert", color="silver")
+    plt.legend(loc="upper left")
+
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.title("ILP", fontsize=18)
     plt.ylabel("Approximation Ratio", fontsize=18)
     plt.xlabel("Number of Vertices", fontsize=18)
     plt.legend(fontsize=15)
@@ -1060,6 +1202,7 @@ if __name__ == '__main__':
     #execution_time_all_NetworkStructures_for_Greedy_LINE()
     # execution_time_all_NetworkStructures_for_Genetic()
     #execution_time_all_NetworkStructures_for_Genetic_LINE()
+    #execution_time_all_NetworkStructures_for_ILP_LINE()
     ########################################################################################################################
     ########################################################################################################################
 
@@ -1067,6 +1210,7 @@ if __name__ == '__main__':
     #costfunction_all_NetworkStructures_for_Approximation()
     #costfunction_all_NetworkStructures_for_Greedy()
     #costfunction_all_NetworkStructures_for_Genetic()
+    #costfunction_all_NetworkStructures_for_ILP()
     ########################################################################################################################
     ########################################################################################################################
 
@@ -1074,13 +1218,15 @@ if __name__ == '__main__':
     #NumberofNodesinVC_all_NetworkStructures_for_Approximation()
     #NumberofNodesinVC_all_NetworkStructures_for_Greedy()
     # NumberofNodesinVC_all_NetworkStructures_for_Genetic()
+    #NumberofNodesinVC_all_NetworkStructures_for_ILP()
     ########################################################################################################################
     ########################################################################################################################
 
     # ApproximationRatio all Network Structures for the various Algorithms ###############################################
-    # ApproximationRatio_all_NetworkStructures_for_Approximation()
+    #ApproximationRatio_all_NetworkStructures_for_Approximation()
     #ApproximationRatio_all_NetworkStructures_for_Greedy()
     ApproximationRatio_all_NetworkStructures_for_Genetic()
+    #ApproximationRatio_all_NetworkStructures_for_ILP()
     ########################################################################################################################
     ########################################################################################################################
 
